@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -60,16 +61,12 @@ func GetUserByUsername(username string) (*User, error) {
 		Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.IsAdmin, &user.CreatedAt)
 
 	if err == sql.ErrNoRows {
-		log.Printf("Utilisateur non trouvé: %s", username)
 		return nil, nil
 	}
 	if err != nil {
-		log.Printf("Erreur lors de la récupération de l'utilisateur: %v", err)
 		return nil, err
 	}
 
-	log.Printf("Utilisateur trouvé: %s (admin: %v)", user.Username, user.IsAdmin)
-	log.Printf("Hash stocké récupéré (len=%d): %x", len(user.Password), user.Password)
 	return user, nil
 }
 
@@ -87,46 +84,29 @@ func GetUserByEmail(email string) (*User, error) {
 }
 
 func CreateUser(username, email, password string) error {
-	log.Printf("Création d'utilisateur - Hash reçu: %s", password)
-
 	// Le mot de passe est déjà hashé par le handler, pas besoin de le hasher à nouveau
 	hashedPassword := []byte(password)
 
 	// Stocker le hash directement en tant que BLOB
-	result, err := db.Exec("INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
+	_, err := db.Exec("INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
 		username, email, hashedPassword)
 
 	if err != nil {
-		log.Printf("Erreur lors de la création de l'utilisateur: %v", err)
 		return err
 	}
-
-	id, _ := result.LastInsertId()
-	log.Printf("Nouvel utilisateur créé: %s (ID: %d)", username, id)
 
 	// Vérifier immédiatement que l'utilisateur peut être récupéré
-	user, err := GetUserByUsername(username)
+	_, err = GetUserByUsername(username)
 	if err != nil {
-		log.Printf("Erreur lors de la vérification de l'utilisateur créé: %v", err)
 		return err
 	}
 
-	log.Printf("Vérification du hash stocké (len=%d): %x", len(user.Password), user.Password)
 	return nil
 }
 
 // Fonction pour tester un mot de passe
 func TestPassword(hashedPassword []byte, password string) error {
-	log.Printf("Test de mot de passe - Hash stocké (len=%d): %x", len(hashedPassword), hashedPassword)
-	log.Printf("Test de mot de passe - Mot de passe fourni: %s", password)
-
-	err := bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
-	if err != nil {
-		log.Printf("Test de mot de passe échoué: %v", err)
-	} else {
-		log.Printf("Test de mot de passe réussi")
-	}
-	return err
+	return bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
 }
 
 func GetAllUsers() ([]User, error) {
@@ -149,18 +129,25 @@ func GetAllUsers() ([]User, error) {
 }
 
 func DeleteUser(id int) error {
-	result, err := db.Exec("DELETE FROM users WHERE id = ? AND is_admin = 0", id)
+	// D'abord vérifier si l'utilisateur existe
+	var isAdmin bool
+	err := db.QueryRow("SELECT is_admin FROM users WHERE id = ?", id).Scan(&isAdmin)
+	if err == sql.ErrNoRows {
+		return sql.ErrNoRows // L'utilisateur n'existe pas
+	}
 	if err != nil {
 		return err
 	}
 
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return err
+	// Si l'utilisateur est admin, on ne peut pas le supprimer
+	if isAdmin {
+		return fmt.Errorf("cannot delete admin user")
 	}
 
-	if rowsAffected == 0 {
-		return sql.ErrNoRows
+	// Supprimer l'utilisateur
+	_, err = db.Exec("DELETE FROM users WHERE id = ?", id)
+	if err != nil {
+		return err
 	}
 
 	return nil

@@ -2,7 +2,7 @@
 export function checkAuth() {
     const token = localStorage.getItem('token');
     const currentPage = window.location.pathname.split('/').pop();
-    const protectedPages = ['solo.html', 'multi.html', 'word-of-day.html'];
+    const protectedPages = ['solo.html', 'multi.html', 'word-of-day.html', 'profile.html'];
     
     console.log('Checking auth:', { token: !!token, currentPage, isProtected: protectedPages.includes(currentPage) });
     
@@ -149,7 +149,7 @@ function updateProfileDisplay() {
 }
 
 // Fonction pour se déconnecter
-function logout() {
+export function logout() {
     localStorage.removeItem('token');
     window.location.href = '/html/home.html';
 }
@@ -160,7 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const registerForm = document.getElementById('register-form');
     const loginForm = document.getElementById('login-form');
-    const logoutButton = document.getElementById('logout-button');
 
     if (registerForm) {
         registerForm.addEventListener('submit', handleRegister);
@@ -168,10 +167,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (loginForm) {
         loginForm.addEventListener('submit', handleLogin);
-    }
-
-    if (logoutButton) {
-        logoutButton.addEventListener('click', logout);
     }
 
     // Mettre à jour l'affichage du profil

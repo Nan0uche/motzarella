@@ -100,7 +100,7 @@ func main() {
 
 	// Routes d'administration
 	http.HandleFunc("/api/admin/users", handlers.AuthMiddleware(handlers.AdminMiddleware(handlers.ListUsersHandler)))
-	http.HandleFunc("/api/admin/users/", handlers.AuthMiddleware(handlers.AdminMiddleware(handlers.DeleteUserHandler)))
+	http.HandleFunc("/api/admin/users/delete/", handlers.AuthMiddleware(handlers.AdminMiddleware(handlers.DeleteUserHandler)))
 
 	// Route WebSocket
 	http.HandleFunc("/ws", handleWebSocket)

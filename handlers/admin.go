@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -37,20 +38,30 @@ func ListUsersHandler(w http.ResponseWriter, r *http.Request) {
 func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 	// Extraire l'ID de l'utilisateur de l'URL
 	parts := strings.Split(r.URL.Path, "/")
-	if len(parts) < 4 {
+
+	// L'ID est maintenant le dernier élément du chemin
+	if len(parts) < 6 { // [, api, admin, users, delete, ID]
 		http.Error(w, "ID utilisateur manquant", http.StatusBadRequest)
 		return
 	}
 
-	userID, err := strconv.Atoi(parts[3])
-	if err != nil {
+	// Prendre le dernier élément comme ID
+	userID, err := strconv.Atoi(parts[len(parts)-1])
+	if err != nil || userID <= 0 {
 		http.Error(w, "ID utilisateur invalide", http.StatusBadRequest)
 		return
 	}
 
 	err = database.DeleteUser(userID)
 	if err != nil {
-		http.Error(w, "Erreur lors de la suppression de l'utilisateur", http.StatusInternalServerError)
+		switch {
+		case err == sql.ErrNoRows:
+			http.Error(w, "Utilisateur non trouvé", http.StatusNotFound)
+		case strings.Contains(err.Error(), "cannot delete admin user"):
+			http.Error(w, "Impossible de supprimer un administrateur", http.StatusForbidden)
+		default:
+			http.Error(w, "Erreur lors de la suppression de l'utilisateur", http.StatusInternalServerError)
+		}
 		return
 	}
 

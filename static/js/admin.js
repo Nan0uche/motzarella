@@ -2,91 +2,132 @@ import { checkAuth } from './auth.js';
 
 // Fonction pour charger la liste des utilisateurs
 async function loadUsers() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/html/login.html';
+        return;
+    }
+
     try {
         const response = await fetch('/api/admin/users', {
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'Authorization': `Bearer ${token}`
             }
         });
 
         if (!response.ok) {
-            throw new Error('Erreur lors du chargement des utilisateurs');
+            throw new Error('Erreur lors de la récupération des utilisateurs');
         }
 
         const users = await response.json();
-        displayUsers(users);
-    } catch (error) {
-        console.error('Erreur:', error);
-        alert('Erreur lors du chargement des utilisateurs');
-    }
-}
-
-// Fonction pour afficher les utilisateurs
-function displayUsers(users) {
-    const usersList = document.getElementById('users-list');
-    usersList.innerHTML = '';
-
-    users.forEach(user => {
-        const userItem = document.createElement('div');
-        userItem.className = 'user-item';
-        userItem.innerHTML = `
-            <div class="user-info">
-                <span><strong>Pseudo:</strong> ${user.username}</span>
-                <span><strong>Email:</strong> ${user.email}</span>
-                <span><strong>Date d'inscription:</strong> ${new Date(user.created_at).toLocaleDateString()}</span>
-            </div>
-            <div class="user-actions">
-                ${!user.is_admin ? `<button class="btn-delete" data-userid="${user.id}">Supprimer</button>` : ''}
-            </div>
+        const usersList = document.querySelector('.users-list');
+        
+        // Créer le tableau des utilisateurs
+        const table = document.createElement('table');
+        table.className = 'users-table';
+        
+        // En-tête du tableau
+        const thead = document.createElement('thead');
+        thead.innerHTML = `
+            <tr>
+                <th>Pseudo</th>
+                <th>Email</th>
+                <th>Date d'inscription</th>
+                <th>Admin</th>
+                <th>Actions</th>
+            </tr>
         `;
-        usersList.appendChild(userItem);
-    });
-
-    // Ajouter les écouteurs d'événements pour les boutons de suppression
-    document.querySelectorAll('.btn-delete').forEach(button => {
-        button.addEventListener('click', async () => {
-            if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
-                await deleteUser(button.dataset.userid);
+        table.appendChild(thead);
+        
+        // Corps du tableau
+        const tbody = document.createElement('tbody');
+        users.forEach(user => {
+            const tr = document.createElement('tr');
+            const createdAt = new Date(user.created_at);
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            
+            // Créer le bouton de suppression séparément pour un meilleur contrôle
+            let deleteButton = '';
+            if (!user.is_admin) {
+                const button = document.createElement('button');
+                button.className = 'btn-danger delete-user';
+                button.dataset.id = user.id;
+                button.textContent = 'Supprimer';
+                deleteButton = button.outerHTML;
             }
+            
+            tr.innerHTML = `
+                <td>${user.username}</td>
+                <td>${user.email}</td>
+                <td>${createdAt.toLocaleDateString('fr-FR', options)}</td>
+                <td>${user.is_admin ? '✅' : '❌'}</td>
+                <td>${deleteButton}</td>
+            `;
+            tbody.appendChild(tr);
         });
-    });
-}
+        table.appendChild(tbody);
+        
+        // Remplacer le contenu existant par le nouveau tableau
+        usersList.innerHTML = '';
+        usersList.appendChild(table);
+        
+        // Ajouter les écouteurs d'événements pour les boutons de suppression
+        document.querySelectorAll('.delete-user').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                const userId = parseInt(e.currentTarget.dataset.id, 10);
+                
+                // Vérifier que l'ID est bien un nombre
+                if (isNaN(userId) || userId <= 0) {
+                    alert('ID utilisateur invalide');
+                    return;
+                }
 
-// Fonction pour supprimer un utilisateur
-async function deleteUser(userId) {
-    try {
-        const response = await fetch(`/api/admin/users/${userId}`, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
+                if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
+                    try {
+                        const response = await fetch(`/api/admin/users/delete/${userId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            // Recharger la liste des utilisateurs
+                            loadUsers();
+                        } else {
+                            const errorText = await response.text();
+                            if (response.status === 403) {
+                                alert('Vous n\'avez pas les droits pour supprimer cet utilisateur');
+                            } else if (response.status === 404) {
+                                alert('Utilisateur non trouvé ou ne peut pas être supprimé');
+                                loadUsers(); // Recharger la liste pour mettre à jour l'affichage
+                            } else {
+                                alert(`Erreur lors de la suppression de l'utilisateur: ${errorText}`);
+                            }
+                        }
+                    } catch (error) {
+                        alert(`Erreur lors de la suppression de l'utilisateur: ${error.message}`);
+                    }
+                }
+            });
         });
-
-        if (!response.ok) {
-            throw new Error('Erreur lors de la suppression de l\'utilisateur');
-        }
-
-        // Recharger la liste des utilisateurs
-        loadUsers();
     } catch (error) {
         console.error('Erreur:', error);
-        alert('Erreur lors de la suppression de l\'utilisateur');
+        if (error.message.includes('401')) {
+            // Non autorisé, rediriger vers la page de connexion
+            localStorage.removeItem('token');
+            window.location.href = '/html/login.html';
+        }
     }
 }
 
 // Initialisation
 document.addEventListener('DOMContentLoaded', () => {
-    // Vérifier si l'utilisateur est admin
-    if (checkAuth()) {
-        const token = localStorage.getItem('token');
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        
-        if (!payload.is_admin) {
-            window.location.href = '/html/home.html';
-            return;
-        }
-
-        // Charger la liste des utilisateurs
-        loadUsers();
+    // Vérifier l'authentification
+    if (!checkAuth()) {
+        return; // checkAuth() redirigera déjà vers login.html si nécessaire
     }
+    
+    // Charger la liste des utilisateurs
+    loadUsers();
 }); 

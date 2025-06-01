@@ -216,8 +216,9 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-// ProfileHandler renvoie les informations du profil de l'utilisateur
+// ProfileHandler gère la récupération des informations du profil
 func ProfileHandler(w http.ResponseWriter, r *http.Request) {
+	// Récupérer l'utilisateur depuis le contexte (ajouté par le middleware)
 	user := r.Context().Value("user").(*database.User)
 	if user == nil {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -228,7 +229,7 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Renvoyer les informations du profil
-	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"username":   user.Username,
 		"email":      user.Email,

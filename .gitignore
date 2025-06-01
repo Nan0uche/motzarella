@@ -1,0 +1,7 @@
+# Fichiers de configuration avec des clés sensibles
+static/js/config.js
+
+# Autres fichiers à ignorer
+node_modules/
+.env
+.DS_Store 

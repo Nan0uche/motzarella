@@ -70,9 +70,15 @@ func main() {
 		port = "8080"
 	}
 
-	// Servir les fichiers statiques
-	fs := http.FileServer(http.Dir("static"))
-	http.Handle("/", fs)
+	// Redirection de la racine vers home.html
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/" {
+			http.Redirect(w, r, "/html/home.html", http.StatusMovedPermanently)
+			return
+		}
+		fs := http.FileServer(http.Dir("static"))
+		fs.ServeHTTP(w, r)
+	})
 
 	// Route WebSocket
 	http.HandleFunc("/ws", handleWebSocket)
@@ -118,6 +124,14 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 			if game != nil {
 				// Vérifier si le joueur a déjà gagné ou perdu
 				if len(game.Guesses[conn]) > 0 && (game.Guesses[conn][len(game.Guesses[conn])-1] == game.Word || len(game.Guesses[conn]) >= 6) {
+					continue
+				}
+
+				if !isValidWord(guess) {
+					conn.WriteJSON(map[string]interface{}{
+						"type":    "error",
+						"message": "Mot non reconnu dans le dictionnaire.",
+					})
 					continue
 				}
 
@@ -248,4 +262,13 @@ func matchmaking() {
 func generateGameID() string {
 	rand.Seed(time.Now().UnixNano())
 	return "game-" + string(rand.Intn(1000))
+}
+
+func isValidWord(guess string) bool {
+	for _, w := range words {
+		if guess == w {
+			return true
+		}
+	}
+	return false
 }

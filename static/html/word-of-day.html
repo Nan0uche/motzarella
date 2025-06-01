@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motzarella - Mot du jour</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <header class="game-header">
+        <nav class="game-nav">
+            <a href="home.html" class="nav-logo">MOTZARELLA</a>
+            <div class="nav-links">
+                <a href="solo.html" class="nav-link">🎮 Solo</a>
+                <a href="multi.html" class="nav-link">👥 Multijoueur</a>
+                <a href="rules.html" class="nav-link">📖 Règles</a>
+                <a href="word-of-day.html" class="nav-link">📚 Mot du jour</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="game-content">
+        <div class="word-of-day-container">
+            <h1>Mot du jour</h1>
+
+            <div class="word-card">
+                <div class="word-header">
+                    <h2 id="current-word">Chargement...</h2>
+                    <p class="date" id="current-date"></p>
+                </div>
+                
+                <div class="word-definition">
+                    <h3>Définition</h3>
+                    <p id="word-definition">Chargement de la définition...</p>
+                </div>
+
+                <div class="word-examples">
+                    <h3>Exemples</h3>
+                    <ul id="word-examples">
+                        <li>Chargement des exemples...</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../js/word-of-day.js"></script>
+</body>
+</html> 

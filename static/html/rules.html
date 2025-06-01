@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Motzarella - Règles du jeu</title>
+    <title>Motzarella - Règles</title>
     <link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
@@ -15,6 +15,7 @@
                 <a href="multi.html" class="nav-link">👥 Multijoueur</a>
                 <a href="rules.html" class="nav-link">📖 Règles</a>
                 <a href="word-of-day.html" class="nav-link">📚 Mot du jour</a>
+                <a href="#" class="nav-link profile-link">👤 Se connecter</a>
             </div>
         </nav>
     </header>
@@ -23,31 +24,39 @@
         <div class="rules-container">
             <h1>Règles du jeu</h1>
 
-            <section class="rules-section">
-                <h2>Principe du jeu</h2>
-                <p>Motzarella est un jeu de devinettes de mots. Vous avez 6 essais pour deviner le mot mystère. Après chaque tentative, les lettres se colorent pour vous indiquer si elles sont :</p>
+            <div class="rules-section">
+                <h2>Objectif</h2>
+                <p>Devinez le mot mystère en 6 essais maximum. Après chaque essai, les couleurs des tuiles changent pour montrer à quel point vous étiez proche du mot.</p>
+            </div>
+
+            <div class="rules-section">
+                <h2>Exemples</h2>
                 <ul>
-                    <li><span class="example correct">Verte</span> : La lettre est bien placée</li>
-                    <li><span class="example present">Jaune</span> : La lettre est dans le mot mais mal placée</li>
-                    <li><span class="example absent">Grise</span> : La lettre n'est pas dans le mot</li>
+                    <li>
+                        <span class="example" style="background-color: var(--success-color);">M</span>
+                        La lettre M est dans le mot et bien placée.
+                    </li>
+                    <li>
+                        <span class="example" style="background-color: var(--present-color);">O</span>
+                        La lettre O est dans le mot mais mal placée.
+                    </li>
+                    <li>
+                        <span class="example" style="background-color: var(--keyboard-bg);">U</span>
+                        La lettre U n'est pas dans le mot.
+                    </li>
                 </ul>
-            </section>
+            </div>
 
-            <section class="rules-section">
-                <h2>Mode Solo</h2>
-                <p>Dans le mode solo, vous jouez contre vous-même. Un nouveau mot est choisi aléatoirement à chaque partie. Essayez de deviner le mot en un minimum d'essais !</p>
-            </section>
-
-            <section class="rules-section">
-                <h2>Mode Multijoueur</h2>
-                <p>Dans le mode multijoueur, vous affrontez un autre joueur en temps réel. Le premier à trouver le mot gagne la partie ! Si aucun des joueurs ne trouve le mot en 6 essais, la partie est déclarée nulle.</p>
-            </section>
-
-            <section class="rules-section">
-                <h2>Mot du jour</h2>
-                <p>Chaque jour, un nouveau mot est choisi avec sa définition. C'est l'occasion d'enrichir votre vocabulaire tout en jouant !</p>
-            </section>
+            <div class="rules-section">
+                <h2>Modes de jeu</h2>
+                <ul>
+                    <li>🎮 <strong>Solo</strong> : Jouez à votre rythme contre l'ordinateur.</li>
+                    <li>👥 <strong>Multijoueur</strong> : Affrontez d'autres joueurs en temps réel.</li>
+                    <li>📚 <strong>Mot du jour</strong> : Un nouveau mot à deviner chaque jour.</li>
+                </ul>
+            </div>
         </div>
     </div>
+    <script src="../js/auth.js"></script>
 </body>
 </html>

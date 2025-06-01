@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Motzarella - Mot du jour</title>
+    <title>Motzarella - Connexion</title>
     <link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
@@ -21,30 +21,24 @@
     </header>
 
     <div class="game-content">
-        <div class="word-of-day-container">
-            <h1>Mot du jour</h1>
-
-            <div class="word-card">
-                <div class="word-header">
-                    <h2 id="current-word">Chargement...</h2>
-                    <p class="date" id="current-date"></p>
+        <div class="auth-container">
+            <h1>Connexion</h1>
+            <form id="login-form" class="auth-form">
+                <div class="form-group">
+                    <label for="username">Pseudo</label>
+                    <input type="text" id="username" name="username" required>
                 </div>
-                
-                <div class="word-definition">
-                    <h3>Définition</h3>
-                    <p id="word-definition">Chargement de la définition...</p>
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" name="password" required>
                 </div>
-
-                <div class="word-examples">
-                    <h3>Exemples</h3>
-                    <ul id="word-examples">
-                        <li>Chargement des exemples...</li>
-                    </ul>
-                </div>
-            </div>
+                <button type="submit" class="btn-primary">Se connecter</button>
+            </form>
+            <p class="auth-redirect">
+                Pas encore de compte ? <a href="register.html">S'inscrire</a>
+            </p>
         </div>
     </div>
-    <script src="../js/word-of-day.js"></script>
-    <script src="../js/auth.js"></script>
+    <script type="module" src="../js/auth.js"></script>
 </body>
 </html> 

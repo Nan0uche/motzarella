@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motzarella - Inscription</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <header class="game-header">
+        <nav class="game-nav">
+            <a href="home.html" class="nav-logo">MOTZARELLA</a>
+            <div class="nav-links">
+                <a href="solo.html" class="nav-link">🎮 Solo</a>
+                <a href="multi.html" class="nav-link">👥 Multijoueur</a>
+                <a href="rules.html" class="nav-link">📖 Règles</a>
+                <a href="word-of-day.html" class="nav-link">📚 Mot du jour</a>
+                <a href="#" class="nav-link profile-link">👤 Se connecter</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="game-content">
+        <div class="auth-container">
+            <h1>Inscription</h1>
+            <form id="register-form" class="auth-form">
+                <div class="form-group">
+                    <label for="username">Pseudo</label>
+                    <input type="text" id="username" name="username" required minlength="3" maxlength="20">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" name="password" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="confirm-password">Confirmer le mot de passe</label>
+                    <input type="password" id="confirm-password" name="confirm-password" required>
+                </div>
+                <button type="submit" class="btn-primary">S'inscrire</button>
+            </form>
+            <p class="auth-redirect">
+                Déjà un compte ? <a href="login.html">Se connecter</a>
+            </p>
+        </div>
+    </div>
+    <script type="module" src="../js/auth.js"></script>
+</body>
+</html> 

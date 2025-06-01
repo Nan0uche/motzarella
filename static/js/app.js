@@ -1,3 +1,5 @@
+import { checkAuth } from './auth.js';
+
 let socket;
 let gameId = null;
 let currentGuess = '';

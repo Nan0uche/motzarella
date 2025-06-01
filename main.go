@@ -7,7 +7,11 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"strings"
 	"time"
+
+	"motzarella/database"
+	"motzarella/handlers"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
@@ -59,6 +63,16 @@ var words = []string{
 	"ZABRES", "ZAINES", "ZAMBIE", "ZANZIS", "ZAPPES", "ZEBRES", "ZELOTE", "ZENITH", "ZESTES", "ZIBELI",
 }
 
+// Middleware pour gérer les en-têtes MIME des fichiers JavaScript
+func addJSMimeTypeMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasSuffix(r.URL.Path, ".js") {
+			w.Header().Set("Content-Type", "application/javascript")
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 	err := godotenv.Load()
 	if err != nil {
@@ -70,15 +84,23 @@ func main() {
 		port = "8080"
 	}
 
-	// Redirection de la racine vers home.html
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/" {
-			http.Redirect(w, r, "/html/home.html", http.StatusMovedPermanently)
-			return
-		}
-		fs := http.FileServer(http.Dir("static"))
-		fs.ServeHTTP(w, r)
-	})
+	// Initialisation de la base de données
+	database.InitDB()
+
+	// Routes statiques avec middleware pour les fichiers JS
+	fileServer := http.FileServer(http.Dir("static"))
+	http.Handle("/", addJSMimeTypeMiddleware(fileServer))
+
+	// Routes d'authentification
+	http.HandleFunc("/api/register", handlers.RegisterHandler)
+	http.HandleFunc("/api/login", handlers.LoginHandler)
+
+	// Routes protégées
+	http.HandleFunc("/api/profile", handlers.AuthMiddleware(handlers.ProfileHandler))
+
+	// Routes d'administration
+	http.HandleFunc("/api/admin/users", handlers.AuthMiddleware(handlers.AdminMiddleware(handlers.ListUsersHandler)))
+	http.HandleFunc("/api/admin/users/", handlers.AuthMiddleware(handlers.AdminMiddleware(handlers.DeleteUserHandler)))
 
 	// Route WebSocket
 	http.HandleFunc("/ws", handleWebSocket)

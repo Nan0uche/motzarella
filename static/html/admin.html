@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Motzarella - Mode Solo</title>
+    <title>Motzarella - Administration</title>
     <link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
@@ -15,33 +15,25 @@
                 <a href="multi.html" class="nav-link">👥 Multijoueur</a>
                 <a href="rules.html" class="nav-link">📖 Règles</a>
                 <a href="word-of-day.html" class="nav-link">📚 Mot du jour</a>
-                <a href="#" class="nav-link profile-link">👤 Se connecter</a>
+                <a href="#" class="nav-link profile-link">👤 Admin</a>
             </div>
         </nav>
     </header>
 
     <div class="game-content">
-        <div class="game-container">
-            <h1>Mode Solo</h1>
-
-            <div id="game-info">
-                <div id="attempts">Essai 0/6</div>
-                <div id="timer">00:00</div>
-            </div>
+        <div class="admin-container">
+            <h1>Administration</h1>
             
-            <div id="game-board">
-                <!-- Les cases seront créées dynamiquement -->
+            <div class="admin-section">
+                <h2>Liste des utilisateurs</h2>
+                <div class="users-list" id="users-list">
+                    <!-- La liste des utilisateurs sera chargée dynamiquement -->
+                </div>
             </div>
-
-            <div id="keyboard">
-                <!-- Le clavier sera créé dynamiquement -->
-            </div>
-
-            <div id="message"></div>
         </div>
     </div>
 
-    <script type="module" src="/js/auth.js"></script>
-    <script type="module" src="/js/solo.js"></script>
+    <script type="module" src="../js/auth.js"></script>
+    <script type="module" src="../js/admin.js"></script>
 </body>
-</html>
+</html> 
